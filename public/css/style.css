@@ -1,0 +1,116 @@
+body {
+    font-family: 'Courier New';
+    margin: 0;
+    background-color: #fbfbfb;
+}
+
+.navbar {
+    overflow: hidden;
+    background-color: #333;
+    margin: none;
+}
+
+.navbar a {
+    float: left;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 15px;
+    text-decoration: none;
+    font-size: 17px;
+}
+
+.navbar a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+.navbar a.active {
+    background-color: #4488ff;
+    color: white;
+}
+
+#content {
+    margin: 30;
+}
+
+h2 {
+    font-weight: normal;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid black;
+    padding: 5px;
+}
+
+#browse {
+    display: block;
+}
+
+#crud {
+    display: block;
+}
+
+.field {
+    padding: 10;
+}
+
+label {
+    padding-left: 15;
+    padding-bottom: 20;
+}
+
+input, button, option {
+    font-family: 'Courier New';
+}
+
+.btn {
+    padding-left: 20;
+}
+
+.index{
+    padding:2rem;
+    border:#333;
+    border-style:double;
+    border-radius:1em;
+    background-color: #333;
+    font-size: 100%;
+    position: absolute;
+    text-align: left;
+    margin-left: 25%;
+    margin-top:5%;
+}
+
+.index a {
+    overflow: hidden;
+    background-color: #333;
+    margin-bottom: 5em;
+    color: #f2f2f2;
+    text-align: center;
+    text-decoration: none;
+    font-size: 30px;
+}
+
+.index a:hover {
+    background-color: #333;
+    color: black;
+}
+ .list h1 {
+    background-color:azure;
+    color:#333;
+    text-align: center;
+    font-size:3rem;
+ }
+
+.list p {
+    color:azure;
+    font-size:large;
+    font:bold;
+}
+
+.main {
+    background-color: #333;
+}
