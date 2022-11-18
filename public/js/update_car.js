@@ -46,6 +46,11 @@ updateCarForm.addEventListener("submit", function (e) {
             // Add the new data to the table
             updateRow(xhttp.response, carIDValue);
 
+            inputCarID.value = '';
+            inputColor.value = '';
+            inputModelName.value = '';
+            inputOrderID.value = '';
+
         }
         else if (xhttp.readyState == 4 && xhttp.status != 200) {
             console.log("There was an error with the input.")
@@ -60,22 +65,27 @@ updateCarForm.addEventListener("submit", function (e) {
 
 function updateRow(data, carID){
     let parsedData = JSON.parse(data);
-    
+    console.log(parsedData)
     let table = document.getElementById("cars-table");
 
     for (let i = 0, row; row = table.rows[i]; i++) {
        //iterate through rows
        //rows would be accessed using the "row" variable assigned in the for loop
        if (table.rows[i].getAttribute("data-value") == carID) {
-
             // Get the location of the row where we found the matching person ID
             let updateRowIndex = table.getElementsByTagName("tr")[i];
+            // Get td of updated values
 
-            // Get td of homeworld value
-            let td = updateRowIndex.getElementsByTagName("td")[3];
+            let modelNameTD = updateRowIndex.getElementsByTagName("td")[1];
+            let colorTD = updateRowIndex.getElementsByTagName("td")[2];
+            let orderIdTD = updateRowIndex.getElementsByTagName("td")[3];
+            let dealershipNameTD = updateRowIndex.getElementsByTagName("td")[4];
 
-            // Reassign homeworld to our value we updated to
-            td.innerHTML = parsedData[0].name; 
+            // Reassign model_name, color, order_id, dealership_name to our value we updated to
+            modelNameTD.innerHTML = parsedData[0].model_name;
+            colorTD.innerHTML = parsedData[0].color;
+            orderIdTD.innerHTML = parsedData[0].order_id;
+            dealershipNameTD.innerHTML = parsedData[0].dealership_name; 
        }
     }
 }

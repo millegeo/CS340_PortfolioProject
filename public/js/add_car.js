@@ -66,7 +66,7 @@ addRowToTable = (data) => {
     let parsedData = JSON.parse(data);
     let newRow = parsedData[parsedData.length - 1]
 
-    // Create a row and 4 cells
+    // Create a row and 6 cells
     let row = document.createElement("TR");
     let idCell = document.createElement("TD");
     let modelNameCell = document.createElement("TD");
@@ -80,9 +80,11 @@ addRowToTable = (data) => {
     modelNameCell.innerText = newRow.model_name;
     colorCell.innerText = newRow.color;
     orderIDCell.innerText = newRow.order_id;
+    dealershipNameCell.innerText = newRow.dealership_name;
 
-    deleteCell = document.createElement("button");
-    deleteCell.innerHTML = "Delete";
+    var deleteButton = document.createElement('button');
+    deleteButton.innerHTML = "Delete";
+    deleteCell.appendChild(deleteButton);
     deleteCell.onclick = function(){
         deleteCar(newRow.car_id);
     };
@@ -92,6 +94,7 @@ addRowToTable = (data) => {
     row.appendChild(modelNameCell);
     row.appendChild(colorCell);
     row.appendChild(orderIDCell);
+    row.appendChild(dealershipNameCell);
     row.appendChild(deleteCell);
 
     //Add a row attribute so the deleteRow function can find a newly added row
