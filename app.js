@@ -135,15 +135,16 @@ app.delete('/delete-car-ajax/:carID', function(req,res,next){
 app.put('/put-car-ajax', function(req,res,next){
     let data = req.body;
   
-    let orderID = parseInt(data.orderID);
-    let car = parseInt(data.modelName);
+    let carID = parseInt(data.carID);
+    let modelName = (data.modelName);
     let color = data.color;
+    let orderID = parseInt(data.orderID);
   
-    let queryUpdateCar = `UPDATE Cars SET order_id = ${orderID}, color= "${color}" WHERE Cars.car_id = ${car}`;
-    let selectCar = `SELECT * FROM Cars WHERE car_id = ${car}`
+    let queryUpdateCar = `UPDATE Cars SET Cars.model_name = "${modelName}", order_id = ${orderID}, color= "${color}" WHERE Cars.car_id = ${carID}`;
+    let selectCar = `SELECT * FROM Cars WHERE car_id = ${carID}`
   
           // Run the 1st query
-          db.pool.query(queryUpdateCar, [orderID, car, color], function(error, rows, fields){
+          db.pool.query(queryUpdateCar, [carID, orderID, modelName, color], function(error, rows, fields){
             
             if (error) {
 
@@ -157,7 +158,7 @@ app.put('/put-car-ajax', function(req,res,next){
             else
             {
                 // Run the second query
-                db.pool.query(selectCar, [car], function(error, rows, fields) {
+                db.pool.query(selectCar, [carID], function(error, rows, fields) {
 
                     if (error) {
                         console.log(error);

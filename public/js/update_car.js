@@ -9,23 +9,26 @@ updateCarForm.addEventListener("submit", function (e) {
     e.preventDefault();
 
     // Get form fields we need to get data from
-    let inputModelName = document.getElementById("mySelect");
+    let inputCarID = document.getElementById("mySelect");
+    let inputModelName = document.getElementById("input-model-name-update");
     let inputOrderID = document.getElementById("input-order-update");
     let inputColor = document.getElementById("input-color-update")
 
     // Get the values from the form fields
+    let carIDValue = inputCarID.value;
     let modelNameValue = inputModelName.value;
     let orderIDValue = inputOrderID.value;
     let colorValue = inputColor.value;
 
 
-    if (isNaN(orderIDValue)) 
+    if (isNaN(carIDValue)) 
     {
         return;
     }
 
     // Put our data we want to send in a javascript object
     let data = {
+        carID: carIDValue,
         modelName: modelNameValue,
         orderID: orderIDValue,
         color: colorValue
@@ -41,7 +44,7 @@ updateCarForm.addEventListener("submit", function (e) {
         if (xhttp.readyState == 4 && xhttp.status == 200) {
 
             // Add the new data to the table
-            updateRow(xhttp.response, modelNameValue);
+            updateRow(xhttp.response, carIDValue);
 
         }
         else if (xhttp.readyState == 4 && xhttp.status != 200) {
