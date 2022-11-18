@@ -10,88 +10,90 @@
     <a href="/suppliers-page">Suppliers</a>
     <a href="/carparts-page">Cars & Parts</a>
 </div>
+<div class="content">
+    <h1>Cars</h1>
+    <table id="cars-table">
+        <thead>
+            <tr>
+                {{#each data.[0]}}
+                <th>
+                    {{@key}}
+                </th>
+                {{/each}}
+                <th>delete</th>
+            </tr>
+        </thead>
 
-<table id="cars-table">>
-    <thead>
-        <tr>
-            {{#each data.[0]}}
-            <th>
-                {{@key}}
-            </th>
+        <tbody>
+
+            {{#each data}}
+            <tr data-value={{this.car_id}}>
+                <td>{{this.car_id}}</td>
+                <td>{{this.model_name}}</td>
+                <td>{{this.color}}</td>
+                <td>{{this.order_id}}</td>
+                <td>{{this.dealership_name}}</td>
+                <td><button onclick="deleteCar({{this.car_id}})">Delete</button></td>
+            </tr>
             {{/each}}
-            <th>delete</th>
-        </tr>
-    </thead>
+        </tbody>
+    </table>
 
-    <tbody>
+    <h3>Add a Car</h3>
+    <p>To add a new car, please enter their information below and click 'Submit'!</p>
+    <form id="add-car-form-ajax">
+        <label for="input-model_name">Model Name: </label>
+        <input type="text" name="input-model_name" id="input-model_name">
+        
+        <label for="input-color">Color: </label>
+        <input type="text" name="input-color" id="input-color">
 
-        {{#each data}}
-        <tr data-value={{this.car_id}}>>
-            <td>{{this.car_id}}</td>
-            <td>{{this.model_name}}</td>
-            <td>{{this.color}}</td>
-            <td>{{this.order_id}}</td>
-            <td>{{this.dealership_name}}</td>
-            <td><button onclick="deleteCar({{this.car_id}})">Delete</button></td>
-        </tr>
-        {{/each}}
-    </tbody>
-</table>
+        <select name="input-order_id" id="input-order_id">
+                <option value="">Select an Order</option>
+                {{#each orders}}
+                <option value="{{this.order_id}}">{{this.order_id}}</option>
+                {{/each}}
+        </select>
 
-<h2>Adding Data with AJAX</h2>
-<p>To add a new car, please enter their information below and click 'Submit'!</p>
-<form id="add-car-form-ajax">
-    <label for="input-model_name">Model Name: </label>
-    <input type="text" name="input-model_name" id="input-model_name">
-    
-    <label for="input-color">Color: </label>
-    <input type="text" name="input-color" id="input-color">
+        <input type="submit">
+    </form>
 
-    <select name="input-order_id" id="input-order_id">
-            <option value="">Select an Order</option>
+    <h3>Search Using an HTML Form</h3>
+    <p>Search by car model using the field below.</p>
+    <form id="search-car-html" method='GET' action='/cars-page'>
+        <label for="input-model_name">Search by Model: </label>
+        <input type="text" name="model_name" id="input-model_name-html-search">
+        
+        <input type="submit">
+        <a href='/cars-page'><button>Reset</button></a>
+    </form>
+
+    <h3>Updating A Car Form</h3>
+    <p>To update a specific user's homeworld select their name from the drop-down menu on the left and their desired homeworld from the drop down menu on the right</p>
+    <form id="update-car-form-ajax">
+
+        <label for="input-model_name">Model name: </label>
+        <select name="input-model_name" id="mySelect">
+            <option value="test">Select a Car</option>
+            {{#each data}}
+            <option value="{{this.car_id}}">{{this.model_name}}</option>
+            {{/each}}
+        </select>
+
+        <label for="input-order">Order ID: </label>
+        <select name="input-order" id="input-order-update">
+            <option>Select an Order to Change Car To:</option>
             {{#each orders}}
             <option value="{{this.order_id}}">{{this.order_id}}</option>
             {{/each}}
-    </select>
+        </select>
 
-    <input type="submit">
-</form>
+        <label for="input-color">Color: </label>
+        <input type="text" id="input-color-update" name="input-color-update">
+        <input type="submit">
 
-<h2>Search Using an HTML Form</h2>
-<p>Search by car model using the field below.</p>
-<form id="search-car-html" method='GET' action='/cars-page'>
-    <label for="input-model_name">Search by Model: </label>
-    <input type="text" name="model_name" id="input-model_name-html-search">
-    
-    <input type="submit">
-    <a href='/cars-page'><button>Reset</button></a>
-</form>
-
-<h2>Updating A Car Form</h2>
-<p>To update a specific user's homeworld select their name from the drop-down menu on the left and their desired homeworld from the drop down menu on the right</p>
-<form id="update-car-form-ajax">
-
-    <label for="input-model_name">Model name: </label>
-    <select name="input-model_name" id="mySelect">
-        <option value="test">Select a Car</option>
-        {{#each data}}
-        <option value="{{this.car_id}}">{{this.model_name}}</option>
-        {{/each}}
-    </select>
-
-    <label for="input-order">Order ID: </label>
-    <select name="input-order" id="input-order-update">
-        <option>Select an Order to Change Car To:</option>
-        {{#each orders}}
-        <option value="{{this.order_id}}">{{this.order_id}}</option>
-        {{/each}}
-    </select>
-
-    <label for="input-color">Color: </label>
-    <input type="text" id="input-color-update" name="input-color-update">
-    <input type="submit">
-
-</form>
+    </form>
+</div>
 
 
 
