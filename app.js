@@ -140,7 +140,7 @@ app.put('/put-car-ajax', function(req,res,next){
     let orderID = parseInt(data.orderID);
   
     let queryUpdateCar = `UPDATE Cars SET Cars.model_name = "${modelName}", order_id = ${orderID}, color= "${color}" WHERE Cars.car_id = ${carID}`;
-    let selectCar = `SELECT * FROM Cars WHERE car_id = ${carID}`
+    let selectCar = `SELECT Cars.car_id, Cars.model_name, Cars.color, Cars.order_id, Dealerships.dealership_name FROM Cars JOIN Car_orders ON Cars.order_id = Car_orders.order_id JOIN Dealerships ON Car_orders.dealership_id = Dealerships.dealership_id WHERE Cars.car_id = ${carID}`
   
           // Run the 1st query
           db.pool.query(queryUpdateCar, [carID, orderID, modelName, color], function(error, rows, fields){
@@ -157,7 +157,7 @@ app.put('/put-car-ajax', function(req,res,next){
             else
             {
                 // Run the second query
-                db.pool.query(selectCar, [carID], function(error, rows, fields) {
+                db.pool.query(selectCar, [orderID, modelName, color], function(error, rows, fields) {
 
                     if (error) {
                         console.log(error);
