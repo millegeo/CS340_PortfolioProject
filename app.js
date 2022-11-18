@@ -91,7 +91,7 @@ app.post('/add-car-ajax', function(req, res)
         else
         {
             // If there was no error, perform a SELECT * on bsg_people
-            query2 = `SELECT * FROM Cars;`;
+            query2 = `SELECT Cars.car_id, Cars.model_name, Cars.color, Cars.order_id, Dealerships.dealership_name FROM Cars JOIN Car_orders ON Cars.order_id = Car_orders.order_id JOIN Dealerships ON Car_orders.dealership_id = Dealerships.dealership_id;`;
             db.pool.query(query2, function(error, rows, fields){
 
                 // If there was an error on the second query, send a 400

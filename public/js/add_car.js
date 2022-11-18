@@ -72,6 +72,7 @@ addRowToTable = (data) => {
     let modelNameCell = document.createElement("TD");
     let colorCell = document.createElement("TD");
     let orderIDCell = document.createElement("TD");
+    let dealershipNameCell = document.createElement("TD");
     let deleteCell = document.createElement("TD");
 
     // Fill the cells with correct data
