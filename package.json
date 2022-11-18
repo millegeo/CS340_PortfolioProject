@@ -1,13 +1,21 @@
 {
-  "name": "term_project",
+  "name": "cs340_portfolioproject",
   "version": "1.0.0",
-  "description": "",
+  "description": "Term Project",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Geoff Miller",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/millegeo/CS340_PortfolioProject.git"
+  },
+  "author": "",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/millegeo/CS340_PortfolioProject/issues"
+  },
+  "homepage": "https://github.com/millegeo/CS340_PortfolioProject#readme",
   "dependencies": {
     "express": "^4.18.2",
     "express-handlebars": "^6.0.6",
