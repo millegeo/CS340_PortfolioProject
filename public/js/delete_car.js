@@ -20,7 +20,19 @@ function deleteCar(carID) {
       for (let i = 0, row; row = table.rows[i]; i++) {
          if (table.rows[i].getAttribute("data-value") == carID) {
               table.deleteRow(i);
+              deleteDropDownMenu(carID);
               break;
          }
       }
+  }
+
+  function deleteDropDownMenu(carID){
+    let selectMenu = document.getElementById("mySelect");
+    for (let i = 0; i < selectMenu.length; i++){
+      if (Number(selectMenu.options[i].value) === Number(carID)){
+        selectMenu[i].remove();
+        break;
+      } 
+  
+    }
   }
