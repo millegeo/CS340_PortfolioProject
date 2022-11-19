@@ -173,12 +173,74 @@ app.put('/put-car-ajax', function(req,res,next){
 ********************************ROUTE HANDLING FOR ALL DEALERSHIPS ENTITY QUERIES********************
 */
 
-// RENDER THE DEALERSHIPS PAGE
+// RENDER THE DEALERSHIPS PAGE/SHOW TABLE FOR ENTITY
 
 app.get('/dealerships-page', function(req, res) 
+{
+
+    let query1;
+
+    if (req.query.model_name === undefined)
     {
-       return res.render('dealerships-page')
-    });
+        query1 = "SELECT * FROM Dealerships;";
+    }
+
+    else
+    {
+        query1 = `SELECT Cars.car_id, Cars.model_name, Cars.color, Cars.order_id, Dealerships.dealership_name FROM Cars JOIN Car_orders ON Cars.order_id = Car_orders.order_id JOIN Dealerships ON Car_orders.dealership_id = Dealerships.dealership_id AND model_name LIKE "${req.query.model_name}%";`;
+    }
+
+    let query2 = "SELECT * FROM Car_orders;";
+
+    db.pool.query(query1, function(error, rows, fields){
+        
+        let dealerships = rows;
+        return res.render('dealerships-page', {data: dealerships});
+        
+    })
+});
+
+// Route handler for INSERT query/automatically updates the table without refresh.
+
+app.post('/add-dealership-ajax', function(req, res) 
+{
+    // Capture the incoming data and parse it back to a JS object
+    let data = req.body;
+    
+    // Create the query and run it on the database
+    query1 = `INSERT INTO Dealerships (dealership_name, dealership_email, dealership_phone) VALUES ('${data.dealership_name}', '${data.dealership_email}', '${data.dealership_phone}')`;
+    db.pool.query(query1, function(error, rows, fields){
+
+        // Check to see if there was an error
+        if (error) {
+
+            // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+            console.log(error)
+            res.sendStatus(400);
+        }
+        else
+        {
+             // If there was no error, perform a SELECT * on bsg_people
+             query2 = `SELECT * FROM Dealerships`;
+             db.pool.query(query2, function(error, rows, fields){
+ 
+                 // If there was an error on the second query, send a 400
+                 if (error) {
+                     
+                     // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+                     console.log(error);
+                     res.sendStatus(400);
+                 }
+                 // If all went well, send the results of the query back.
+                 else
+                 {
+                     res.send(rows);
+                 }
+             })
+        }
+    })
+});
+
 
 /* 
 ********************************ROUTE HANDLING FOR ALL ORDERS ENTITY QUERIES********************
