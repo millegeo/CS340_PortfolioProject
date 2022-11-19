@@ -1,4 +1,7 @@
-<link rel='stylesheet' href='style.css' />
+<title>Dealerships</title><link rel='stylesheet' href='style.css' />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+
 <div class="navbar">
     <a href="/">Home</a>
     <a class="active" href="/dealerships-page">Dealerships</a>
@@ -9,4 +12,55 @@
     <a href="/carparts-page">Cars & Parts</a>
 </div>
 
-<h1>DEALERSHIPS</h1>
+{{!-- Create table to display dealership information --}}
+
+<div class="content">
+    <h1>Dealerships</h1>
+    <table id="dealerships-table">
+        <thead>
+            <tr>
+                {{#each data.[0]}}
+                <th>
+                    {{@key}}
+                </th>
+                {{/each}}
+                <th>delete</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {{#each data}}
+            <tr data-value={{this.dealership_id}}>
+                <td>{{this.dealership_id}}</td>
+                <td>{{this.dealership_name}}</td>
+                <td>{{this.dealership_email}}</td>
+                <td>{{this.dealership_phone}}</td>
+
+                <td><button onclick="deleteDealership({{this.dealership_id}})">Delete</button></td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+
+{{!-- Add a new dealership --}}
+
+<h3>Add a Dealership</h3>
+    <p>To add a new dealership, please enter their information below and click 'Submit'!</p>
+    <form id="add-dealership-form-ajax">
+        <label for="input-dealership_name">Dealership Name: </label>
+        <input type="text" name="input-dealership_name" id="input-dealership_name">
+        
+        <label for="input-dealership_email">Dealership Email: </label>
+        <input type="email" name="input-dealership_email" id="input-dealership_email">
+
+        <label for="input-dealership_phone">Dealership Phone Number: </label>
+        <input type="tel" name="input-dealership_phone" id="input-dealership_phone">
+
+        <input type="submit">
+    </form>
+
+{{!-- Embed our javascript to handle the DOM manipulation and AJAX request --}}
+<script src="./js/update_dealership.js"></script>
+<script src="./js/add_dealership.js"></script>
+<script src="./js/delete_dealership.js"></script>
