@@ -65,7 +65,6 @@ updateCarForm.addEventListener("submit", function (e) {
 
 function updateRow(data, carID){
     let parsedData = JSON.parse(data);
-    console.log(parsedData)
     let table = document.getElementById("cars-table");
 
     for (let i = 0, row; row = table.rows[i]; i++) {
