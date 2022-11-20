@@ -180,17 +180,16 @@ app.get('/dealerships-page', function(req, res)
 
     let query1;
 
-    if (req.query.model_name === undefined)
+    if (req.query.dealership_name === undefined)
     {
         query1 = "SELECT * FROM Dealerships;";
     }
 
+    // If search being performed use input to retrieve dealership information
     else
     {
-        query1 = `SELECT Cars.car_id, Cars.model_name, Cars.color, Cars.order_id, Dealerships.dealership_name FROM Cars JOIN Car_orders ON Cars.order_id = Car_orders.order_id JOIN Dealerships ON Car_orders.dealership_id = Dealerships.dealership_id AND model_name LIKE "${req.query.model_name}%";`;
+        query1 = `SELECT * FROM Dealerships WHERE dealership_name LIKE "${req.query.dealership_name}%";`;
     }
-
-    let query2 = "SELECT * FROM Car_orders;";
 
     db.pool.query(query1, function(error, rows, fields){
         
@@ -241,6 +240,63 @@ app.post('/add-dealership-ajax', function(req, res)
     })
 });
 
+//Delete handler for Dealerships entity
+
+app.delete('/delete-dealership-ajax/:dealershipID', function(req,res,next){
+    let data = req.body;
+    let dealershipID = parseInt(data.id);
+    let deleteDealership = `DELETE FROM Dealerships WHERE dealership_id = ${dealershipID}`;
+  
+    db.pool.query(deleteDealership, [req.params.dealershipID], function(error, rows, fields) {
+
+        if (error) {
+            console.log(error);
+            res.sendStatus(400);
+        } else {
+            res.sendStatus(204);
+        }
+    })
+});
+
+//Update handler for Dealerships entity
+
+app.put('/put-dealership-ajax', function(req,res,next){
+    let data = req.body;
+  
+    let dealershipID = parseInt(data.dealershipID);
+    let dealershipName = (data.dealershipName);
+    let dealershipEmail = data.dealershipEmail;
+    let dealershipPhone = data.dealershipPhone;
+  
+    let queryUpdateDealership = `UPDATE Dealerships SET Dealerships.dealership_name = "${dealershipName}", Dealerships.dealership_email = "${dealershipEmail}", Dealerships.dealership_phone = "${dealershipPhone}" WHERE Dealerships.dealership_id = ${dealershipID}`;
+    let selectDealership = `SELECT * FROM Dealerships WHERE Dealerships.dealership_id = ${dealershipID}`
+  
+          // Run the 1st query
+          db.pool.query(queryUpdateDealership, [dealershipID, dealershipName, dealershipEmail, dealershipPhone], function(error, rows, fields){
+            
+            if (error) {
+
+            // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+            console.log(error);
+            res.sendStatus(400);
+            }
+
+            // If there was no error, we run our second query and return that data so we can use it to update the car's
+            // table on the front-end
+            else
+            {
+                // Run the second query
+                db.pool.query(selectDealership, [dealershipName, dealershipEmail, dealershipPhone], function(error, rows, fields) {
+
+                    if (error) {
+                        console.log(error);
+                        res.sendStatus(400);
+                    } else {
+                        res.send(rows);
+                    }
+                })
+            }
+})});
 
 /* 
 ********************************ROUTE HANDLING FOR ALL ORDERS ENTITY QUERIES********************
