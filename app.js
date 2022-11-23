@@ -302,10 +302,103 @@ app.put('/put-dealership-ajax', function(req,res,next){
 ********************************ROUTE HANDLING FOR ALL ORDERS ENTITY QUERIES********************
 */
 
-app.get('/orders-page', function(req, res) 
+app.get('/orders-page', function(req, res)
+{
+
+    let query1;
+
+    if (req.query.order_date === undefined)
     {
-       return res.render('orders-page')
-    });
+        query1 = "SELECT Car_orders.order_id, Car_orders.order_date, Dealerships.dealership_name FROM Car_orders INNER JOIN Dealerships ON Car_orders.dealership_id = Dealerships.dealership_id";
+    }
+
+    else
+    {
+        query1 = `SELECT Cars.car_id, Cars.model_name, Cars.color, Cars.order_id, Dealerships.dealership_name FROM Cars JOIN Car_orders ON Cars.order_id = Car_orders.order_id JOIN Dealerships ON Car_orders.dealership_id = Dealerships.dealership_id AND model_name LIKE "${req.query.model_name}%";`;
+    }
+
+    let query2 = "SELECT * FROM Dealerships;";
+
+    db.pool.query(query1, function(error, rows, fields){
+        
+        let orders = rows;
+
+    // Transform default JS date format into better format. Used code from https://stackoverflow.com/questions/58887820/how-to-display-specific-date-format-on-html
+        for (let i=0; i < orders.length; i++) {
+            var dateStr = orders[i]['order_date']
+            var date = new Date(dateStr);
+            var y = date.getFullYear();
+            var m = date.getMonth();
+            var d = date.getDate();
+            var newDate = y + '-'+m+'-'+d;
+            orders[i]['order_date'] = newDate
+        }
+
+        db.pool.query(query2, (error, rows, fields) =>{
+            let dealerships = rows;
+            return res.render('orders-page', {data: orders, dealerships: dealerships});
+        })
+        
+    })
+});
+
+// Route handler for INSERT query/automatically updates the table without refresh.
+
+app.post('/add-order-ajax', function(req, res) 
+{
+// Capture the incoming data and parse it back to a JS object
+let data = req.body;
+
+let dealership_id = parseInt(data.dealership_id);
+if (isNaN(dealership_id))
+{
+    dealership_id = 'NULL'
+}
+
+// Create the query and run it on the database
+query1 = `INSERT INTO Car_orders (order_date, dealership_id) VALUES ('${data.order_date}', ${dealership_id})`;
+db.pool.query(query1, function(error, rows, fields){
+
+    // Check to see if there was an error
+    if (error) {
+
+        // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+        console.log(error)
+        res.sendStatus(400);
+    }
+    else
+    {
+        // If there was no error, perform a SELECT * on bsg_people
+        query2 = "SELECT Car_orders.order_id, Car_orders.order_date, Dealerships.dealership_name FROM Car_orders INNER JOIN Dealerships ON Car_orders.dealership_id = Dealerships.dealership_id";
+        db.pool.query(query2, function(error, rows, fields){
+
+        // Transform default JS date format into better format. Used code from https://stackoverflow.com/questions/58887820/how-to-display-specific-date-format-on-html
+        for (let i=0; i < rows.length; i++) {
+            var dateStr = rows[i]['order_date']
+            var date = new Date(dateStr);
+            var y = date.getFullYear();
+            var m = date.getMonth();
+            var d = date.getDate();
+            var newDate = y + '-'+m+'-'+d;
+            rows[i]['order_date'] = newDate
+        }
+
+            // If there was an error on the second query, send a 400
+            if (error) {
+                
+                // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+                console.log(error);
+                res.sendStatus(400);
+            }
+            // If all went well, send the results of the query back.
+            else
+            {
+                res.send(rows);
+            }
+        })
+    }
+})
+});
 
 /* 
 ********************************ROUTE HANDLING FOR ALL PARTS ENTITY QUERIES********************
