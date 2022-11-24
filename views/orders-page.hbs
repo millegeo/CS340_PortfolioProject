@@ -1,4 +1,6 @@
-<link rel='stylesheet' href='style.css' />
+<title>Orders</title><link rel='stylesheet' href='style.css' />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
 <div class="navbar">
     <a href="/">Home</a>
     <a href="/dealerships-page">Dealerships</a>
@@ -52,38 +54,35 @@
     </form>
 
     <h3>Search Using an HTML Form</h3>
-    <p>Search by car model using the field below.</p>
-    <form id="search-car-html" method='GET' action='/cars-page'>
-        <label for="input-model_name">Search by Model: </label>
-        <input type="text" name="model_name" id="input-model_name-html-search">
+    <p>Search by Dealership Name using the field below.</p>
+    <form id="search-order-html" method='GET' action='/orders-page'>
+        <label for="input-dealership_name">Search by Dealership: </label>
+        <input type="text" name="dealership_name" id="input-dealership_name-html-search">
         
         <input type="submit">
-        <a href='/cars-page'><button>Reset</button></a>
+        <a href='/orders-page'><button>Reset</button></a>
     </form>
 
-    <h3>Updating A Car Form</h3>
-    <p>To update a car select its ID from the drop-down menu on the left and enter its updated data.</p>
-    <form id="update-car-form-ajax">
+    <h3>Updating an Order Form</h3>
+    <p>To update an Order select its ID from the drop-down menu on the left and enter its updated data.</p>
+    <form id="update-order-form-ajax">
 
-        <label for="input-car_id">Car ID: </label>
-        <select name="input-car_id" id="mySelect">
-            <option value="test">Select a Car</option>
+        <label for="input-order_id">Order ID: </label>
+        <select name="input-order_id" id="mySelect">
+            <option value="test">Select an Order</option>
             {{#each data}}
-            <option value="{{this.car_id}}">{{this.car_id}}</option>
+            <option value="{{this.order_id}}">{{this.order_id}}</option>
             {{/each}}
         </select>
 
-        <label for="input-model_name">Model name: </label>
-        <input type="text" id="input-model-name-update" name="input-model-name-update">
+        <label for="input-order_date">Change Order Date: </label>
+        <input type="date" id="input-order-date-update" name="input-order-date-update">
 
-        <label for="input-color">Color: </label>
-        <input type="text" id="input-color-update" name="input-color-update">
-
-        <label for="input-order">Order ID: </label>
-        <select name="input-order" id="input-order-update">
-            <option>Select an Order:</option>
-            {{#each orders}}
-            <option value="{{this.order_id}}">{{this.order_id}}</option>
+        <label for="input-dealership-name">Dealership Name: </label>
+        <select name="input-dealership-name-update" id="input-dealership-name-update">
+            <option>Select a New Dealership:</option>
+            {{#each dealerships}}
+            <option value="{{this.dealership_id}}">{{this.dealership_name}}</option>
             {{/each}}
         </select>
 

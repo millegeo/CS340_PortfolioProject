@@ -307,14 +307,14 @@ app.get('/orders-page', function(req, res)
 
     let query1;
 
-    if (req.query.order_date === undefined)
+    if (req.query.dealership_name === undefined)
     {
         query1 = "SELECT Car_orders.order_id, Car_orders.order_date, Dealerships.dealership_name FROM Car_orders INNER JOIN Dealerships ON Car_orders.dealership_id = Dealerships.dealership_id";
     }
 
     else
     {
-        query1 = `SELECT Cars.car_id, Cars.model_name, Cars.color, Cars.order_id, Dealerships.dealership_name FROM Cars JOIN Car_orders ON Cars.order_id = Car_orders.order_id JOIN Dealerships ON Car_orders.dealership_id = Dealerships.dealership_id AND model_name LIKE "${req.query.model_name}%";`;
+        query1 = `SELECT Car_orders.order_id, Car_orders.order_date, Dealerships.dealership_name FROM Car_orders INNER JOIN Dealerships ON Car_orders.dealership_id = Dealerships.dealership_id AND Dealerships.dealership_name LIKE "${req.query.dealership_name}%";`;
     }
 
     let query2 = "SELECT * FROM Dealerships;";
@@ -327,11 +327,17 @@ app.get('/orders-page', function(req, res)
         for (let i=0; i < orders.length; i++) {
             var dateStr = orders[i]['order_date']
             var date = new Date(dateStr);
-            var y = date.getFullYear();
-            var m = date.getMonth();
-            var d = date.getDate();
+            var y = String(date.getFullYear());
+            var m = String(date.getMonth());
+            var d = String(date.getDate());
             var newDate = y + '-'+m+'-'+d;
-            orders[i]['order_date'] = newDate
+            
+            if (y == 'NaN' || m == 'NaN' || d == 'NaN') {
+                orders[i]['order_date'] = 'NULL'
+            }
+            else {
+                orders[i]['order_date'] = newDate
+            }
         }
 
         db.pool.query(query2, (error, rows, fields) =>{
@@ -380,7 +386,12 @@ db.pool.query(query1, function(error, rows, fields){
             var m = date.getMonth();
             var d = date.getDate();
             var newDate = y + '-'+m+'-'+d;
-            rows[i]['order_date'] = newDate
+            if (y == 'NaN' || m == 'NaN' || d == 'NaN') {
+                rows[i]['order_date'] = 'NULL'
+            }
+            else {
+                rows[i]['order_date'] = newDate
+            }
         }
 
             // If there was an error on the second query, send a 400
@@ -399,6 +410,78 @@ db.pool.query(query1, function(error, rows, fields){
     }
 })
 });
+
+//Delete handler for Orders entity
+
+app.delete('/delete-order-ajax/:orderId', function(req,res,next){
+    let data = req.body;
+    let orderId = parseInt(data.id);
+    let deleteOrder = `DELETE FROM Car_orders WHERE order_id = ${orderId}`;
+  
+    db.pool.query(deleteOrder, [req.params.orderId], function(error, rows, fields) {
+
+        if (error) {
+            console.log(error);
+            res.sendStatus(400);
+        } else {
+            res.sendStatus(204);
+        }
+    })
+});
+
+//Update handler for Orders entity
+
+app.put('/put-order-ajax', function(req,res,next){
+    let data = req.body;
+    let orderId = parseInt(data.orderId);
+    let dealershipName = parseInt(data.dealershipName);
+    let orderDate = data.orderDate;
+  
+    let queryUpdateOrder = `UPDATE Car_orders SET Car_orders.order_date = "${orderDate}", Car_orders.dealership_id = ${dealershipName} WHERE Car_orders.order_id = ${orderId}`;
+    let selectOrder = `SELECT Car_orders.order_id, Car_orders.order_date, Dealerships.dealership_name, Car_orders.dealership_id FROM Car_orders INNER JOIN Dealerships ON Car_orders.dealership_id = Dealerships.dealership_id WHERE Car_orders.order_id = ${orderId}`
+  
+          // Run the 1st query
+          db.pool.query(queryUpdateOrder, [orderId, dealershipName, orderDate], function(error, rows, fields){
+            
+            if (error) {
+
+            // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+            console.log(error);
+            res.sendStatus(400);
+            }
+
+            // If there was no error, we run our second query and return that data so we can use it to update the car's
+            // table on the front-end
+            else
+            {
+                // Run the second query
+                db.pool.query(selectOrder, [dealershipName, orderId, orderDate], function(error, rows, fields) {
+
+                    // Transform default JS date format into better format. Used code from https://stackoverflow.com/questions/58887820/how-to-display-specific-date-format-on-html
+                    for (let i=0; i < rows.length; i++) {
+                        var dateStr = rows[i]['order_date']
+                        var date = new Date(dateStr);
+                        var y = date.getFullYear();
+                        var m = date.getMonth();
+                        var d = date.getDate();
+                        var newDate = y + '-'+m+'-'+d;
+                        if (y == 'NaN' || m == 'NaN' || d == 'NaN') {
+                            rows[i]['order_date'] = 'NULL'
+                        }
+                        else {
+                            rows[i]['order_date'] = newDate
+                        }
+                    }
+
+                    if (error) {
+                        console.log(error);
+                        res.sendStatus(400);
+                    } else {
+                        res.send(rows);
+                    }
+                })
+            }
+})});
 
 /* 
 ********************************ROUTE HANDLING FOR ALL PARTS ENTITY QUERIES********************

@@ -55,9 +55,9 @@ CREATE TABLE Dealerships (
 CREATE TABLE Car_orders (
     order_id int NOT NULL AUTO_INCREMENT,
     order_date date NOT NULL,
-    dealership_id int,
+    dealership_id int NOT NULL,
     PRIMARY KEY (order_id),
-    FOREIGN KEY (dealership_id) REFERENCES Dealerships(dealership_id) ON DELETE SET NULL ON UPDATE CASCADE
+    FOREIGN KEY (dealership_id) REFERENCES Dealerships(dealership_id) ON UPDATE CASCADE
 );
 
 SET FOREIGN_KEY_CHECKS = 1;
