@@ -1,4 +1,5 @@
-<link rel='stylesheet' href='style.css' />
+<title>Car Parts</title><link rel='stylesheet' href='style.css' />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
 <div class="navbar">
     <a href="/">Home</a>
@@ -10,4 +11,102 @@
     <a class="active" href="/carparts-page">Cars & Parts</a>
 </div>
 
-<h1>Car Parts</h1>
+<div class="content">
+    <h1>Car Parts</h1>
+    <table id="carparts-table">
+        <thead>
+            <tr>
+                {{#each data.[0]}}
+                <th>
+                    {{@key}}
+                </th>
+                {{/each}}
+                <th>delete</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {{#each data}}
+            <tr data-value={{this.car_part_id}}>
+                <td>{{this.car_part_id}}</td>
+                <td>{{this.model_name}}</td>
+                <td>{{this.part_name}}</td>
+                <td><button onclick="deleteCarPart({{this.car_part_id}})">Delete</button></td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+
+    <h3>Add a new Car Part</h3>
+    <p>To add a new car part, please select the model and part for that model below and click 'Submit'!</p>
+    <form id="add-carpart-form-ajax">
+
+        <label for="input-car_id">Select Existing Car: </label>
+        <select name="input-car_id" id="input-car_id">
+            <option value="">Select a Car</option>
+            {{#each cars}}
+            <option value="{{this.car_id}}">{{this.car_id}}: {{this.model_name}}</option>
+            {{/each}}
+        </select>
+
+        <label for="input-part_id">Select Existing Part: </label>
+        <select name="input-part_id" id="input-part_id">
+            <option value="">Select a Part</option>
+            {{#each parts}}
+            <option value="{{this.part_id}}">{{this.part_id}}: {{this.part_name}}</option>
+            {{/each}}
+        </select>
+
+        <input type="submit">
+    </form>
+
+    <h3>Search Using an HTML Form</h3>
+    <p>Search by car model using the field below.</p>
+    <form id="search-car-html" method='GET' action='/carparts-page'>
+        <label for="input-model_name">Search by Model: </label>
+        <input type="text" name="model_name" id="input-model_name-html-search">
+        
+        <input type="submit">
+        <a href='/carparts-page'><button>Reset</button></a>
+    </form>
+
+    <h3>Updating A Car/Part Form</h3>
+    <p>To update a car part select its ID from the drop-down menu on the left and select its updated data.</p>
+    <form id="update-carpart-form-ajax">
+
+        <label for="input-car_part_id">Car Part ID: </label>
+        <select name="input-car_part_id" id="mySelect">
+            <option value="test">Select a Car/Part</option>
+            {{#each data}}
+            <option value="{{this.car_part_id}}">{{this.car_part_id}}, {{this.model_name}}, {{this.part_name}}</option>
+            {{/each}}
+        </select>
+
+        <label for="input-car-id">Car Name: </label>
+        <select name="input-car-id" id="input-car-id-update">
+            <option>Select a Car Model</option>
+            {{#each cars}}
+            <option value="{{this.car_id}}">{{this.car_id}}: {{this.model_name}}</option>
+            {{/each}}
+        </select>
+
+        <label for="input-part-id">Part Name: </label>
+        <select name="input-part-id" id="input-part-id-update">
+            <option>Select a Part</option>
+            {{#each parts}}
+            <option value="{{this.part_id}}">{{this.part_id}}: {{this.part_name}}</option>
+            {{/each}}
+        </select>
+
+        <input type="submit">
+
+    </form>
+</div>
+
+
+
+{{!-- Embed our javascript to handle the DOM manipulation and AJAX request --}}
+<script src="./js/update_carpart.js"></script>
+<script src="./js/add_carpart.js"></script>
+<script src="./js/delete_carpart.js"></script>

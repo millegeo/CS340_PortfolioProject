@@ -505,10 +505,153 @@ app.get('/suppliers-page', function(req, res)
 ********************************ROUTE HANDLING FOR ALL CARPARTS ENTITY QUERIES********************
 */
 
-app.get('/carparts-page', function(req, res) 
+// Render main cars-page that selects all of the information required for the table.
+
+app.get('/carparts-page', function(req, res)
     {
-       return res.render('carparts-page')
+
+        let query1;
+
+        if (req.query.model_name === undefined)
+        {
+            query1 = "SELECT Cars_Parts.car_part_id, Cars.model_name, Parts.part_name FROM Cars_Parts JOIN Cars ON Cars_Parts.car_id = Cars.car_id JOIN Parts ON Cars_Parts.part_id = Parts.part_id;";
+        }
+
+        else
+        {
+            query1 = `SELECT Cars_Parts.car_part_id, Cars.model_name, Parts.part_name FROM Cars_Parts JOIN Cars ON Cars_Parts.car_id = Cars.car_id JOIN Parts ON Cars_Parts.part_id = Parts.part_id AND Cars.model_name LIKE "${req.query.model_name}%";`;
+        }
+
+        let query2 = "SELECT * FROM Cars;";
+        let query3 = "Select * FROM Parts;";
+
+        db.pool.query(query1, function(error, rows, fields){
+            
+            let car_parts = rows;
+
+            db.pool.query(query2, (error, rows, fields) =>{
+
+                let cars = rows;
+
+                db.pool.query(query3, (error, rows, fields) =>{
+
+                    let parts = rows;
+
+                    return res.render('carparts-page', {data: car_parts, cars: cars, parts: parts});
+                })
+                
+            })
+            
+        })
     });
+    
+// Route handler for INSERT query.
+
+app.post('/add-carpart-ajax', function(req, res) 
+    {
+    // Capture the incoming data and parse it back to a JS object
+    let data = req.body;
+
+    let car_id = parseInt(data.car_id);
+    let part_id = parseInt(data.part_id);
+    if (isNaN(car_id))
+    {
+        car_id = 'NULL'
+    }
+    if (isNaN(part_id))
+    {
+        part_id = 'NULL'
+    }
+
+    // Create the query and run it on the database
+    query1 = `INSERT INTO Cars_Parts (car_id, part_id) VALUES (${car_id}, ${part_id})`;
+    db.pool.query(query1, function(error, rows, fields){
+
+        // Check to see if there was an error
+        if (error) {
+
+            // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+            console.log(error)
+            res.sendStatus(400);
+        }
+        else
+        {
+            // If there was no error, perform a SELECT * on Cars_Parts
+            query2 = "SELECT Cars_Parts.car_part_id, Cars.model_name, Parts.part_name FROM Cars_Parts JOIN Cars ON Cars_Parts.car_id = Cars.car_id JOIN Parts ON Cars_Parts.part_id = Parts.part_id;";
+            db.pool.query(query2, function(error, rows, fields){
+
+                // If there was an error on the second query, send a 400
+                if (error) {
+                    
+                    // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+                    console.log(error);
+                    res.sendStatus(400);
+                }
+                // If all went well, send the results of the query back.
+                else
+                {
+                    res.send(rows);
+                }
+            })
+        }
+    })
+    });
+
+//Delete handler for Cars_Parts entity
+
+app.delete('/delete-carpart-ajax/:carPartId', function(req,res,next){
+    let data = req.body;
+    let carPartId = parseInt(data.id);
+    let deleteCarPart = `DELETE FROM Cars_Parts WHERE car_part_id = ${carPartId}`;
+  
+    db.pool.query(deleteCarPart, [req.params.carPartId], function(error, rows, fields) {
+
+        if (error) {
+            console.log(error);
+            res.sendStatus(400);
+        } else {
+            res.sendStatus(204);
+        }
+    })
+});
+
+//Update handler for Car_Parts entity
+
+app.put('/put-carpart-ajax', function(req,res,next){
+    let data = req.body;
+    let carPartId = parseInt(data.carPartId);
+    let carId = parseInt(data.carId);
+    let partId = parseInt(data.partId);
+  
+    let queryUpdateCarPart = `UPDATE Cars_Parts SET Cars_Parts.car_id = ${carId}, Cars_Parts.part_id = ${partId} WHERE Cars_Parts.car_part_id = ${carPartId}`;
+    let selectCarPart = `SELECT Cars_Parts.car_part_id, Cars.model_name, Parts.part_name FROM Cars_Parts JOIN Cars ON Cars_Parts.car_id = Cars.car_id JOIN Parts ON Cars_Parts.part_id = Parts.part_id WHERE Cars_Parts.car_part_id = ${carPartId}`
+  
+          // Run the 1st query
+          db.pool.query(queryUpdateCarPart, [carPartId, carId, partId], function(error, rows, fields){
+            
+            if (error) {
+
+            // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+            console.log(error);
+            res.sendStatus(400);
+            }
+
+            // If there was no error, we run our second query and return that data so we can use it to update the car's
+            // table on the front-end
+            else
+            {
+                // Run the second query
+                db.pool.query(selectCarPart, [carPartId, carId, partId], function(error, rows, fields) {
+                    
+                    if (error) {
+                        console.log(error);
+                        res.sendStatus(400);
+                    } else {
+                        res.send(rows);
+                    }
+                })
+            }
+})});
 
 /*
     LISTENER
