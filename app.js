@@ -6,7 +6,7 @@
 var express = require('express');   // We are using the express library for the web server
 var app     = express();            // We need to instantiate an express object to interact with the server in our code
 var path = require('path');
-PORT        = 10258;                 // Set a port number at the top so it's easy to change in the future
+PORT        = 10259;                 // Set a port number at the top so it's easy to change in the future
 // Database
 var db = require('./database/db-connector')
 const { engine } = require('express-handlebars');
@@ -643,6 +643,138 @@ app.put('/put-carpart-ajax', function(req,res,next){
                 // Run the second query
                 db.pool.query(selectCarPart, [carPartId, carId, partId], function(error, rows, fields) {
                     
+                    if (error) {
+                        console.log(error);
+                        res.sendStatus(400);
+                    } else {
+                        res.send(rows);
+                    }
+                })
+            }
+})});
+
+/*
+***************Routes for Parts entity and data manipulations***************************
+*/
+
+// Render main parts-page that selects all of the information required for the table.
+
+app.get('/parts-page', function(req, res)
+    {
+
+        let query1;
+
+        if (req.query.part_name === undefined)
+        {
+            query1 = "SELECT Parts.part_id, Parts.part_name, Parts.supplier_id, Suppliers.supplier_name FROM Parts JOIN Suppliers ON Parts.supplier_id = Suppliers.supplier_id;";
+        }
+
+        else
+        {
+            query1 = `SELECT Parts.part_id, Parts.part_name, Parts.supplier_id, Suppliers.supplier_name FROM Parts JOIN Suppliers ON Parts.supplier_id = Suppliers.supplier_id WHERE Parts.part_name LIKE "${req.query.part_name}%";`;
+        }
+
+        db.pool.query(query1, function(error, rows, fields) {
+            
+            res.render('parts-page', {data: rows});
+            
+        })
+    });
+
+// Route handler for INSERT query/automatically updates the table without refresh.
+
+app.post('/add-part-ajax', function(req, res) 
+{
+    // Capture the incoming data and parse it back to a JS object
+    let data = req.body;
+
+    let supplier_id = parseInt(data.supplier_id);
+    if (isNaN(supplier_id))
+    {
+        supplier_id = 'NULL'
+    }
+    
+    // Create the query and run it on the database
+    query1 = `INSERT INTO Parts (part_name, supplier_id) VALUES ('${data.part_name}', ${data.supplier_id})`;
+    db.pool.query(query1, function(error, rows, fields){
+
+        // Check to see if there was an error
+        if (error) {
+
+            // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+            console.log(error)
+            res.sendStatus(400);
+        }
+        else
+        {
+            // If there was no error, perform a SELECT * on bsg_people
+            query2 = `SELECT Parts.part_id, Parts.part_name, Parts.supplier_id, Suppliers.supplier_name FROM Parts JOIN Suppliers ON Parts.supplier_id = Suppliers.supplier_id;`;
+            db.pool.query(query2, function(error, rows, fields){
+
+                // If there was an error on the second query, send a 400
+                if (error) {
+                    
+                    // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+                    console.log(error);
+                    res.sendStatus(400);
+                }
+                // If all went well, send the results of the query back.
+                else
+                {
+                    res.send(rows);
+                }
+            })
+        }
+    })
+});
+
+//Delete handler for Cars entity
+
+app.delete('/delete-part-ajax/:partID', function(req,res,next){
+    let data = req.body;
+    let partID = parseInt(data.id);
+    let deleteCar = `DELETE FROM Parts WHERE part_id = ${partID}`;
+  
+    db.pool.query(deletePart, [req.params.partID], function(error, rows, fields) {
+
+        if (error) {
+            console.log(error);
+            res.sendStatus(400);
+        } else {
+            res.sendStatus(204);
+        }
+    })
+});
+
+//Update handler for Parts entity
+
+app.put('/put-part-ajax', function(req,res,next){
+    let data = req.body;
+  
+    let partID = parseInt(data.partID);
+    let partName = (data.partName);
+    let supplierID = data.supplierID;
+  
+    let queryUpdatePart = `UPDATE Parts SET Parts.part_name = "${partName}", supplier_id = ${supplierID} WHERE Parts.part_id = ${partID}`;
+    let selectPart = `SELECT Parts.part_id, Parts.part_name, Parts.supplier_id, Suppliers.supplier_name FROM Parts JOIN Suppliers ON Parts.supplier_id = Suppliers.supplier_id WHERE Parts.part_id = ${partID}`
+  
+          // Run the 1st query
+          db.pool.query(queryUpdatePart, [partID, partName, supplierID], function(error, rows, fields){
+            
+            if (error) {
+
+            // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+            console.log(error);
+            res.sendStatus(400);
+            }
+
+            // If there was no error, we run our second query and return that data so we can use it to update the part's
+            // table on the front-end
+            else
+            {
+                // Run the second query
+                db.pool.query(selectPart, [partName, supplierID], function(error, rows, fields) {
+
                     if (error) {
                         console.log(error);
                         res.sendStatus(400);

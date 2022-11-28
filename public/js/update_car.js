@@ -12,7 +12,7 @@ updateCarForm.addEventListener("submit", function (e) {
     let inputCarID = document.getElementById("mySelect");
     let inputModelName = document.getElementById("input-model-name-update");
     let inputOrderID = document.getElementById("input-order-update");
-    let inputColor = document.getElementById("input-color-update")
+    let inputColor = document.getElementById("input-color-update");
 
     // Get the values from the form fields
     let carIDValue = inputCarID.value;
