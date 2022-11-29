@@ -484,15 +484,6 @@ app.put('/put-order-ajax', function(req,res,next){
 })});
 
 /* 
-********************************ROUTE HANDLING FOR ALL PARTS ENTITY QUERIES********************
-*/
-
-app.get('/parts-page', function(req, res) 
-    {
-       return res.render('parts-page')
-    });
-
-/* 
 ********************************ROUTE HANDLING FOR ALL SUPPLIERS ENTITY QUERIES********************
 */
 
@@ -682,7 +673,7 @@ app.get('/parts-page', function(req, res)
             db.pool.query(query2, (error, rows, fields) =>{
 
                 let suppliers = rows;
-                return res.render('cars-page', {data: parts, suppliers: suppliers});
+                return res.render('parts-page', {data: parts, suppliers: suppliers});
             })
         })
     });
