@@ -44,11 +44,11 @@
         <label for="input-part_name">Part Name: </label>
         <input type="text" name="input-part_name" id="input-part_name">
         
-        <label for="input-supplier_id">Supplier ID: </label>
+        <label for="input-supplier_id">Supplier: </label>
         <select name="input-supplier_id" id="input-supplier_id">
                 <option value="">Select a Supplier</option>
                 {{#each suppliers}}
-                <option value="{{this.supplier_id}}">{{this.supplier_id}}</option>
+                <option value="{{this.supplier_id}}">{{this.supplier_id}}: {{this.supplier_name}}</option>
                 {{/each}}
         </select>
 
@@ -80,11 +80,11 @@
         <label for="input-part_name">Part Name: </label>
         <input type="text" id="input-part_name-update" name="input-part_name-update">
 
-        <label for="input-supplier_id">Supplier ID: </label>
+        <label for="input-supplier_id">Supplier: </label>
         <select name="input-supplier_id" id="input-supplier_id-update">
-            <option>Select a Supplier:</option>
+            <option>Select a Supplier</option>
             {{#each suppliers}}
-            <option value="{{this.supplier_id}}">{{this.supplier_id}}</option>
+            <option value="{{this.supplier_id}}">{{this.supplier_id}}: {{this.supplier_name}}</option>
             {{/each}}
         </select>
 

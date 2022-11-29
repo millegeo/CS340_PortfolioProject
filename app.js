@@ -674,10 +674,16 @@ app.get('/parts-page', function(req, res)
             query1 = `SELECT Parts.part_id, Parts.part_name, Parts.supplier_id, Suppliers.supplier_name FROM Parts JOIN Suppliers ON Parts.supplier_id = Suppliers.supplier_id WHERE Parts.part_name LIKE "${req.query.part_name}%";`;
         }
 
+        let query2 = "SELECT * FROM Suppliers;";
+
         db.pool.query(query1, function(error, rows, fields) {
-            
-            res.render('parts-page', {data: rows});
-            
+            let parts = rows;
+
+            db.pool.query(query2, (error, rows, fields) =>{
+
+                let suppliers = rows;
+                return res.render('cars-page', {data: parts, suppliers: suppliers});
+            })
         })
     });
 
@@ -728,7 +734,7 @@ app.post('/add-part-ajax', function(req, res)
     })
 });
 
-//Delete handler for Cars entity
+//Delete handler for Parts entity
 
 app.delete('/delete-part-ajax/:partID', function(req,res,next){
     let data = req.body;
