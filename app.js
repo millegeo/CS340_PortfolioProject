@@ -730,7 +730,7 @@ app.post('/add-part-ajax', function(req, res)
 app.delete('/delete-part-ajax/:partID', function(req,res,next){
     let data = req.body;
     let partID = parseInt(data.id);
-    let deleteCar = `DELETE FROM Parts WHERE part_id = ${partID}`;
+    let deletePart = `DELETE FROM Parts WHERE part_id = ${partID}`;
   
     db.pool.query(deletePart, [req.params.partID], function(error, rows, fields) {
 

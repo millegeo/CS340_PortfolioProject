@@ -73,12 +73,12 @@ function updateRow(data, partID){
 
             let partNameTD = updateRowIndex.getElementsByTagName("td")[1];
             let supplierIDTD = updateRowIndex.getElementsByTagName("td")[2];
-            // let supplierNameTD = updateRowIndex.getElementsByTagName("td")[3];
+            let supplierNameTD = updateRowIndex.getElementsByTagName("td")[3];
 
             // Reassign model_name, color, order_id, dealership_name to our value we updated to
             partNameTD.innerHTML = parsedData[0].part_name;
             supplierIDTD.innerHTML = parsedData[0].supplier_id;
-            // supplierNameTD.innerHTML = parsedData[0].supplier_name;
+            supplierNameTD.innerHTML = parsedData[0].supplier_name;
        }
     }
 }
