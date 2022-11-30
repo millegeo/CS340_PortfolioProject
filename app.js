@@ -6,7 +6,7 @@
 var express = require('express');   // We are using the express library for the web server
 var app     = express();            // We need to instantiate an express object to interact with the server in our code
 var path = require('path');
-PORT        = 10259;                 // Set a port number at the top so it's easy to change in the future
+PORT        = 10258;                 // Set a port number at the top so it's easy to change in the future
 // Database
 var db = require('./database/db-connector')
 const { engine } = require('express-handlebars');
@@ -484,15 +484,6 @@ app.put('/put-order-ajax', function(req,res,next){
 })});
 
 /* 
-********************************ROUTE HANDLING FOR ALL SUPPLIERS ENTITY QUERIES********************
-*/
-
-app.get('/suppliers-page', function(req, res) 
-    {
-       return res.render('suppliers-page')
-    });
-
-/* 
 ********************************ROUTE HANDLING FOR ALL CARPARTS ENTITY QUERIES********************
 */
 
@@ -771,6 +762,138 @@ app.put('/put-part-ajax', function(req,res,next){
             {
                 // Run the second query
                 db.pool.query(selectPart, [partName, supplierID], function(error, rows, fields) {
+
+                    if (error) {
+                        console.log(error);
+                        res.sendStatus(400);
+                    } else {
+                        res.send(rows);
+                    }
+                })
+            }
+})});
+
+/*
+***************Routes for Suppliers entity and data manipulations***************************
+*/
+
+// Render main suppliers-page that selects all of the information required for the table.
+
+app.get('/suppliers-page', function(req, res)
+    {
+
+        let query1;
+
+        if (req.query.supplier_name === undefined)
+        {
+            query1 = "SELECT Suppliers.supplier_id, Suppliers.supplier_name, Suppliers.supplier_email, Suppliers.supplier_phone FROM Suppliers;";
+        }
+
+        else
+        {
+            query1 = `SELECT Suppliers.supplier_id, Suppliers.supplier_name, Suppliers.supplier_email, Suppliers.supplier_phone FROM Suppliers WHERE Suppliers.supplier_name LIKE "${req.query.supplier_name}%";`;
+        }
+
+        db.pool.query(query1, function(error, rows, fields) {
+            let suppliers = rows;
+            return res.render('suppliers-page', {data: suppliers});
+        })
+    });
+
+// Route handler for INSERT query/automatically updates the table without refresh.
+
+app.post('/add-supplier-ajax', function(req, res) 
+{
+    // Capture the incoming data and parse it back to a JS object
+    let data = req.body;
+
+    let supplier_id = parseInt(data.supplier_id);
+    if (isNaN(supplier_id))
+    {
+        supplier_id = 'NULL'
+    }
+    
+    // Create the query and run it on the database
+    query1 = `INSERT INTO Suppliers (supplier_name, supplier_email, supplier_phone) VALUES ('${data.supplier_name}', '${data.supplier_email}', '${data.supplier_phone}')`;
+    db.pool.query(query1, function(error, rows, fields){
+
+        // Check to see if there was an error
+        if (error) {
+
+            // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+            console.log(error)
+            res.sendStatus(400);
+        }
+        else
+        {
+            // If there was no error, perform a SELECT * on bsg_people
+            query2 = `SELECT Suppliers.supplier_id, Suppliers.supplier_name, Suppliers.supplier_email, Suppliers.supplier_phone FROM Suppliers;`;
+            db.pool.query(query2, function(error, rows, fields){
+
+                // If there was an error on the second query, send a 400
+                if (error) {
+                    
+                    // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+                    console.log(error);
+                    res.sendStatus(400);
+                }
+                // If all went well, send the results of the query back.
+                else
+                {
+                    res.send(rows);
+                }
+            })
+        }
+    })
+});
+
+//Delete handler for Suppliers entity
+
+app.delete('/delete-supplier-ajax/:supplierID', function(req,res,next){
+    let data = req.body;
+    let supplierID = parseInt(data.id);
+    let deleteSupplier = `DELETE FROM Suppliers WHERE supplier_id = ${supplierID}`;
+  
+    db.pool.query(deleteSupplier, [req.params.supplierID], function(error, rows, fields) {
+
+        if (error) {
+            console.log(error);
+            res.sendStatus(400);
+        } else {
+            res.sendStatus(204);
+        }
+    })
+});
+
+//Update handler for Suppliers entity
+
+app.put('/put-supplier-ajax', function(req,res,next){
+    let data = req.body;
+  
+    let supplierID = parseInt(data.supplierID);
+    let supplierName = (data.supplierName);
+    let supplierEmail = (data.supplierEmail);
+    let supplierPhone = (data.supplierPhone);
+  
+    let queryUpdateSupplier = `UPDATE Suppliers SET Suppliers.supplier_name = "${supplierName}", Suppliers.supplier_email = "${supplierEmail}", Suppliers.supplier_phone = "${supplierPhone}" WHERE Suppliers.supplier_id = ${supplierID}`;
+    let selectSupplier = `SELECT Suppliers.supplier_id, Suppliers.supplier_name, Suppliers.supplier_email, Suppliers.supplier_phone FROM Suppliers WHERE Suppliers.supplier_id = ${supplierID}`
+  
+          // Run the 1st query
+          db.pool.query(queryUpdateSupplier, [supplierName, supplierEmail, supplierPhone], function(error, rows, fields){
+            
+            if (error) {
+
+            // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+            console.log(error);
+            res.sendStatus(400);
+            }
+
+            // If there was no error, we run our second query and return that data so we can use it to update the supplier's
+            // table on the front-end
+            else
+            {
+                // Run the second query
+                db.pool.query(selectSupplier, [supplierName, supplierEmail, supplierPhone], function(error, rows, fields) {
 
                     if (error) {
                         console.log(error);
